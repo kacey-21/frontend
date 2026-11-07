@@ -10,3 +10,10 @@ body {
     font-family:"Trebuchet MS";
 
 }
+
+.board {
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 88px);
+    justify-content: center;
+    
+}
