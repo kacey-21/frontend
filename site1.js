@@ -54,3 +54,12 @@ function checkWin() {
     currentPlayer = currentPlayer === "X" ? "O" : "X";
     statusElement.innerText = `Ходит: ${currentPlayer}`;
 }
+function resetGame() {
+    board = ["", "", "", "", "", "", "", "", ""];
+    currentPlayer = "X";
+    gameActive = true;
+    statusElement.innerText = `Ходит: X`;
+    createBoard();
+}
+resetButton.addEventListener("click", resetGame);
+createBoard();
