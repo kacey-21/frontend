@@ -32,3 +32,25 @@ function handleCellClick(cell, index) {
 
     checkWin();
 }
+function checkWin() {
+    let roundWon = false;
+    for (let i = 0; i < WIN_LINES.length; i++) {
+        const [a, b, c] = WIN_LINES[i];
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            roundWon = true;
+            break;
+        }
+    }
+    if (roundWon) {
+        statusElement.innerText = `Победил: ${currentPlayer}!`;
+        gameActive = false;
+        return;
+    }
+    if (!board.includes("")) {
+        statusElement.innerText = "Ничья!";
+        gameActive = false;
+        return;
+    }
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    statusElement.innerText = `Ходит: ${currentPlayer}`;
+}
