@@ -31,3 +31,23 @@ function loadGame() {
         game.reset();
     }
 }
+function render() {
+    const state = game.getState();
+    cells.forEach((cell, index) => {
+        cell.innerText = state.board[index];
+    });
+
+    if (state.winner === 'draw') {
+        statusElement.innerText = "Ничья!";
+    } else if (state.winner) {
+        statusElement.innerText = `Победил: ${state.winner}!`;
+    } else {
+        statusElement.innerText = `Ходит: ${state.currentPlayer}`;
+    }
+}
+
+function addHistoryRecord(player, index) {
+    const li = document.createElement('li');
+    li.innerText = `Игрок ${player} занял клетку ${index + 1}`;
+    historyList.appendChild(li);
+}
