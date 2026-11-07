@@ -9,3 +9,7 @@ const WIN_LINES = [
 let board = ["", "", "", "", "", "", "", "", ""];
 let currentPlayer = "X";
 let gameActive = true;
+
+const boardElement = document.getElementById("board");
+const statusElement = document.getElementById("status");
+const resetButton = document.getElementById("resetButton");
