@@ -51,3 +51,32 @@ function addHistoryRecord(player, index) {
     li.innerText = `Игрок ${player} занял клетку ${index + 1}`;
     historyList.appendChild(li);
 }
+cells.forEach(cell => {
+    cell.addEventListener('click', (e) => {
+        const index = parseInt(e.target.dataset.index, 10);
+        const playerBeforeMove = game.getState().currentPlayer;
+        
+        if (game.makeMove(index)) {
+            addHistoryRecord(playerBeforeMove, index);
+            render();
+            saveGame();
+
+            const state = game.getState();
+            if (state.winner && state.winner !== 'draw') {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+    });
+});
+
+resetButton.addEventListener('click', () => {
+    game.reset();
+    historyList.innerHTML = '';
+    render();
+    saveGame();
+});
+
+roomInput.addEventListener('input', saveGame);
+
+loadGame();
+render();
