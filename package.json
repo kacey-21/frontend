@@ -1,29 +1,21 @@
 {
-  "name": "frontend",
+  "name": "tic-tac-toe-vite",
   "version": "1.0.0",
-  "description": "",
-  "main": "script.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "node --test test/game.test.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kacey-21/frontend.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/kacey-21/frontend/issues"
-  },
-  "homepage": "https://github.com/kacey-21/frontend#readme",
   "dependencies": {
-    "canvas-confetti": "^1.9.4"
+    "canvas-confetti": "^1.9.2"
   },
   "devDependencies": {
-    "eslint": "^10.14.0",
-    "prettier": "^3.9.10",
-    "vite": "^8.3.6"
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "vite": "^5.2.0"
   }
 }
