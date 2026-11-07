@@ -13,3 +13,22 @@ let gameActive = true;
 const boardElement = document.getElementById("board");
 const statusElement = document.getElementById("status");
 const resetButton = document.getElementById("resetButton");
+
+function createBoard() {
+    boardElement.innerHTML = "";
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.addEventListener("click", () => handleCellClick(cell, i));
+        boardElement.appendChild(cell);
+    }
+}
+
+function handleCellClick(cell, index) {
+    if (board[index] !== "" || !gameActive) return;
+
+    board[index] = currentPlayer;
+    cell.innerText = currentPlayer;
+
+    checkWin();
+}
