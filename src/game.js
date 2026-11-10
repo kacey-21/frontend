@@ -25,7 +25,7 @@ export function createGame() {
             state.movesCount++;
 
             let won = false;
-            for (let line of WIN_LINES) {
+            for (const line of WIN_LINES) {
                 const [a, b, c] = line;
                 if (state.board[a] && state.board[a] === state.board[b] && state.board[a] === state.board[c]) {
                     won = true;
