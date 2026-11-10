@@ -9,12 +9,12 @@ const historyList = document.getElementById('historyList');
 const roomInput = document.getElementById('roomName');
 
 function saveGame() {
-    const dataToSave = {
-        gameState: game.getState(),
-        history: historyList.innerHTML,
-        roomInput: roomInput.value
-    };
-    localStorage.setItem('tictactoe_save', JSON.stringify(dataToSave));
+  const dataToSave = {
+    version: SAVE_VERSION,
+    gameState: game.getState(),
+    roomInput: roomInput.value,
+  };
+  localStorage.setItem(SAVE_KEY, JSON.stringify(dataToSave));
 }
 
 function loadGame() {
@@ -23,7 +23,6 @@ function loadGame() {
         if (saved) {
             const parsed = JSON.parse(saved);
             game.loadState(parsed.gameState);
-            historyList.innerHTML = parsed.history || '';
             roomInput.value = parsed.roomInput || '';
         }
     } catch (error) {
@@ -52,21 +51,23 @@ function addHistoryRecord(player, index) {
     historyList.appendChild(li);
 }
 cells.forEach(cell => {
-    cell.addEventListener('click', (e) => {
-        const index = parseInt(e.target.dataset.index, 10);
-        const playerBeforeMove = game.getState().currentPlayer;
-        
-        if (game.makeMove(index)) {
-            addHistoryRecord(playerBeforeMove, index);
-            render();
-            saveGame();
+  cell.addEventListener('click', (e) => {
+    const index = Number(e.currentTarget.dataset.index);
+    if (!Number.isInteger(index) || index < 0 || index > 8) return;
 
-            const state = game.getState();
-            if (state.winner && state.winner !== 'draw') {
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            }
-        }
-    });
+    const playerBeforeMove = game.getState().currentPlayer;
+
+    if (game.makeMove(index)) {
+      addHistoryRecord(playerBeforeMove, index);
+      render();
+      saveGame();
+
+      const state = game.getState();
+      if (state.winner && state.winner !== 'draw') {
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+      }
+    }
+  });
 });
 
 resetButton.addEventListener('click', () => {
