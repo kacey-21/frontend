@@ -50,9 +50,7 @@ function loadGame() {
   }
 }
 
-function render() {
-  const state = game.getState();
-
+function render(state) {
   cells.forEach((cell, index) => {
     cell.innerText = state.board[index];
   });
@@ -73,6 +71,15 @@ function render() {
   });
 }
 
+let rafId = null;
+function scheduleRender(state) {
+  if (rafId !== null) return;
+  rafId = requestAnimationFrame(() => {
+    rafId = null;
+    render(state);
+  });
+}
+
 cells.forEach(cell => {
   cell.addEventListener('click', (e) => {
     const index = Number(e.currentTarget.dataset.index);
@@ -81,8 +88,9 @@ cells.forEach(cell => {
     if (!game.makeMove(index)) return;
 
     const state = game.getState();
-    render();
     saveGame();
+    
+    scheduleRender(state);
 
     if (state.winner && state.winner !== 'draw') {
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -92,11 +100,12 @@ cells.forEach(cell => {
 
 resetButton.addEventListener('click', () => {
   game.reset();
-  render();
+  const state = game.getState();
   saveGame();
+  scheduleRender(state);
 });
 
 roomInput.addEventListener('input', saveGame);
 
 loadGame();
-render();
+scheduleRender(game.getState());
