@@ -13,7 +13,6 @@ function findWinner(board) {
   return null;
 }
 
-
 function isValidState(s) {
   if (!Array.isArray(s?.board) || s.board.length !== 9) return false;
   if (!s.board.every(c => c === "" || c === "X" || c === "O")) return false;
@@ -54,18 +53,21 @@ function isValidState(s) {
     return false;
   }
 
-  if (s.isActive === false) {
-    if (s.winner !== "X" && s.winner !== "O" && s.winner !== "draw") return false;
-  }
-  if (s.isActive === true) {
-    if (s.winner !== null) return false;
+  if (s.winner === "X" || s.winner === "O") {
+    if (actualWinner !== s.winner) return false;
+  } else if (s.winner === "draw") {
+    if (filled !== 9) return false;
+    if (actualWinner !== null) return false;
+  } else {
+    if (actualWinner !== null) return false;
     if (filled === 9) return false;
   }
 
-  if (actualWinner) {
-    if (s.winner !== actualWinner) return false;
-  } else if (filled === 9) {
-    if (s.winner !== "draw") return false;
+  if (s.isActive === false) {
+    if (s.winner === null) return false;
+  }
+  if (s.isActive === true) {
+    if (s.winner !== null) return false;
   }
 
   return true;

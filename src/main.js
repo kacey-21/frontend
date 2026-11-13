@@ -29,6 +29,7 @@ function loadGame() {
     if (parsed.version !== SAVE_VERSION) {
       localStorage.removeItem(SAVE_KEY);
       game.reset();
+      roomInput.value = '';
       return;
     }
 
@@ -72,11 +73,20 @@ function render(state) {
 }
 
 let rafId = null;
+let pendingState = null;
+
 function scheduleRender(state) {
+  pendingState = state;
+  
   if (rafId !== null) return;
+  
   rafId = requestAnimationFrame(() => {
     rafId = null;
-    render(state);
+    const currentState = pendingState;
+    pendingState = null;
+    if (currentState) {
+      render(currentState);
+    }
   });
 }
 
