@@ -13,6 +13,7 @@ function findWinner(board) {
   return null;
 }
 
+
 function isValidState(s) {
   if (!Array.isArray(s?.board) || s.board.length !== 9) return false;
   if (!s.board.every(c => c === "" || c === "X" || c === "O")) return false;
