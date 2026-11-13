@@ -17,13 +17,19 @@ function isValidState(s) {
   if (!Array.isArray(s?.board) || s.board.length !== 9) return false;
   if (!s.board.every(c => c === "" || c === "X" || c === "O")) return false;
 
-  const filled = s.board.filter(Boolean).length;
+  const xCount = s.board.filter(c => c === "X").length;
+  const oCount = s.board.filter(c => c === "O").length;
+  const filled = xCount + oCount;
 
+  if (xCount < oCount || xCount > oCount + 1) return false;
   if (s.movesCount !== undefined && s.movesCount !== filled) return false;
 
-  if (s.currentPlayer !== "X" && s.currentPlayer !== "O") return false;
-  const expectedPlayer = filled % 2 === 0 ? "X" : "O";
-  if (s.currentPlayer !== expectedPlayer) return false;
+  if (s.isActive) {
+    const expectedPlayer = xCount === oCount ? "X" : "O";
+    if (s.currentPlayer !== expectedPlayer) return false;
+  } else {
+    if (s.currentPlayer !== "X" && s.currentPlayer !== "O") return false;
+  }
 
   if (!Array.isArray(s.history) || s.history.length !== filled) return false;
   if (!s.history.every(h =>
@@ -42,21 +48,24 @@ function isValidState(s) {
   }
 
   const actualWinner = findWinner(s.board);
-  if (s.winner === null || s.winner === undefined) {
-    if (actualWinner !== null) return false;
-    if (filled === 9) return false;
-  } else if (s.winner === "draw") {
-    if (filled !== 9) return false;
-    if (actualWinner !== null) return false;
-  } else if (s.winner === "X" || s.winner === "O") {
-    if (actualWinner !== s.winner) return false;
-  } else {
+
+  if (s.winner !== null && s.winner !== "X" && s.winner !== "O" && s.winner !== "draw") {
     return false;
   }
 
-  if (typeof s.isActive !== "boolean") return false;
-  if (s.winner !== null && s.isActive !== false) return false;
-  if (s.winner === null && s.isActive !== true) return false;
+  if (s.isActive === false) {
+    if (s.winner !== "X" && s.winner !== "O" && s.winner !== "draw") return false;
+  }
+  if (s.isActive === true) {
+    if (s.winner !== null) return false;
+    if (filled === 9) return false;
+  }
+
+  if (actualWinner) {
+    if (s.winner !== actualWinner) return false;
+  } else if (filled === 9) {
+    if (s.winner !== "draw") return false;
+  }
 
   return true;
 }
@@ -81,7 +90,7 @@ export function createGame() {
     }),
 
     loadState: (savedState) => {
-      if (!isValidState(savedState)) return;
+      if (!isValidState(savedState)) return false;
 
       state = {
         board: [...savedState.board],
@@ -91,6 +100,8 @@ export function createGame() {
         movesCount: savedState.board.filter(Boolean).length,
         history: savedState.history.map(h => ({ ...h })),
       };
+
+      return true;
     },
 
     makeMove: (index) => {
