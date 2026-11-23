@@ -1,6 +1,5 @@
 import type {
   Board,
-  Cell,
   GameState,
   Move,
   Player,
