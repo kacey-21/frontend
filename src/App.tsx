@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
 
-import { createGame } from './game/game';
+import {
+  createInitialState,
+  makeMove,
+} from './game/game';
 import { GameBoard } from './components/GameBoard';
 import { GameStatus } from './components/GameStatus';
 import { RoomInput } from './components/RoomInput';
 import { MoveHistory } from './components/MoveHistory';
 import { GameControls } from './components/GameControls';
 
-import { createInitialState } from './game/game';
+
 import type { GameState } from './types/game';
 
 const SAVE_KEY = 'tictactoe_save';
@@ -95,30 +98,13 @@ export default function App() {
     }
   }, [gameState, roomName]);
 
-  function handleMove(index: number): void {
-    const game = createGame();
+ function handleMove(index: number): void {
+  setGameState((previousState) => {
+    const newState = makeMove(previousState, index);
 
-    if (!game.loadState(gameState)) {
-      return;
-    }
-
-    if (!game.makeMove(index)) {
-      return;
-    }
-
-    const newState = game.getState();
-
-    setGameState(newState);
-
-    if (newState.winner && newState.winner !== 'draw') {
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
-    }
-  }
-
+    return newState ?? previousState;
+  });
+}
   function handleReset(): void {
     setGameState(createInitialState());
   }
