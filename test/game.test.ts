@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createGame } from '../src/game/game';
+import { createGame, isValidState } from '../src/game/game';
+
 
 test('Смена игрока после успешного хода', () => {
   const game = createGame();
