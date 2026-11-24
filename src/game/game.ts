@@ -32,6 +32,14 @@ function isBoard(value: unknown): value is Board {
   return Array.isArray(value) && value.length === 9 && value.every(isCell);
 }
 
+function copyBoard(board: Board): Board {
+  return [
+    board[0], board[1], board[2],
+    board[3], board[4], board[5],
+    board[6], board[7], board[8],
+  ];
+}
+
 export function createInitialState(): GameState {
   return {
     board: ['', '', '', '', '', '', '', '', ''],
