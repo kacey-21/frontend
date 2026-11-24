@@ -108,7 +108,9 @@ export function findWinner(board: Board): Winner {
   return null;
 }
 function getWinner(board: Board): Player | null {
-  return findWinner(board) as Player | null;
+  const winner = findWinner(board);
+
+  return winner === 'draw' ? null : winner;
 }
 
 export function isValidState(value: unknown): value is GameState {
@@ -195,7 +197,7 @@ export function createGame() {
     getState(): GameState {
       return {
         ...state,
-        board: [...state.board] as Board,
+        board: copyBoard(state.board),
         history: state.history.map((move) => ({ ...move })),
       };
     },
@@ -207,7 +209,7 @@ export function createGame() {
 
       state = {
         ...savedState,
-        board: [...savedState.board] as Board,
+        board: copyBoard(savedState.board),
         history: savedState.history.map((move) => ({ ...move })),
       };
 
