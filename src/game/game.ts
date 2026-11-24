@@ -67,142 +67,83 @@ export function findWinner(board: Board): Winner {
   return null;
 }
 
+
 export function isValidState(value: unknown): value is GameState {
-  if (typeof value !== 'object' || value === null) {
-    return false;
-  }
-
-  const state = value as Record<string, unknown>;
-
-  if (!Array.isArray(state.board) || state.board.length !== 9) {
-    return false;
-  }
-
-  const board = state.board as unknown[];
-
-  if (
-    !board.every(
-      (cell) => cell === '' || cell === 'X' || cell === 'O'
-    )
-  ) {
+  if (!isRecord(value) || !isBoard(value.board)) {
     return false;
   }
 
   if (
-    state.currentPlayer !== 'X' &&
-    state.currentPlayer !== 'O'
+    !isPlayer(value.currentPlayer) ||
+    typeof value.isActive !== 'boolean' ||
+    (value.winner !== null &&
+      value.winner !== 'draw' &&
+      !isPlayer(value.winner)) ||
+    typeof value.movesCount !== 'number' ||
+    !Number.isInteger(value.movesCount) ||
+    !Array.isArray(value.history)
   ) {
     return false;
   }
 
-  if (typeof state.isActive !== 'boolean') {
+  const board = value.board;
+  const history = value.history;
+  const filled = board.filter((cell) => cell !== '').length;
+
+  if (value.movesCount !== filled || history.length !== filled) {
     return false;
   }
 
-  if (
-    state.winner !== null &&
-    state.winner !== 'X' &&
-    state.winner !== 'O' &&
-    state.winner !== 'draw'
-  ) {
-    return false;
-  }
-
-  const xCount = board.filter((cell) => cell === 'X').length;
-  const oCount = board.filter((cell) => cell === 'O').length;
-  const filled = xCount + oCount;
-
-  if (xCount < oCount || xCount > oCount + 1) {
-    return false;
-  }
-
-  if (state.movesCount !== filled) {
-    return false;
-  }
-
-  if (state.isActive) {
-    const expectedPlayer = xCount === oCount ? 'X' : 'O';
-
-    if (state.currentPlayer !== expectedPlayer) {
-      return false;
-    }
-  }
-
-  if (!Array.isArray(state.history)) {
-    return false;
-  }
-
-  const history = state.history as unknown[];
-
-  if (history.length !== filled) {
-    return false;
-  }
-
-  const seen = new Set<number>();
+  const replay: Board = ['', '', '', '', '', '', '', '', ''];
+  let playerToMove: Player = 'X';
+  let replayWinner: Player | null = null;
+  let replayDraw = false;
 
   for (const item of history) {
-    if (typeof item !== 'object' || item === null) {
+    if (!isRecord(item) || !isPlayer(item.player)) {
       return false;
     }
 
-    const move = item as Record<string, unknown>;
-
-    if (move.player !== 'X' && move.player !== 'O') {
-      return false;
-    }
+    const index = item.index;
 
     if (
-      !Number.isInteger(move.index) ||
-      typeof move.index !== 'number' ||
-      move.index < 0 ||
-      move.index > 8
+      typeof index !== 'number' ||
+      !Number.isInteger(index) ||
+      index < 0 ||
+      index > 8 ||
+      item.player !== playerToMove ||
+      replay[index] !== '' ||
+      replayWinner !== null ||
+      replayDraw
     ) {
       return false;
     }
 
-    if (board[move.index] !== move.player) {
-      return false;
-    }
+    replay[index] = item.player;
+    replayWinner = getWinner(replay);
+    replayDraw =
+      replayWinner === null &&
+      replay.every((cell) => cell !== '');
 
-    if (seen.has(move.index)) {
-      return false;
-    }
-
-    seen.add(move.index);
-  }
-
-  for (let i = 0; i < 9; i++) {
-    if (board[i] !== '' && !seen.has(i)) {
-      return false;
+    if (replayWinner === null && !replayDraw) {
+      playerToMove = playerToMove === 'X' ? 'O' : 'X';
     }
   }
 
-  const actualWinner = findWinner(board as Board);
-
-  if (state.winner === 'X' || state.winner === 'O') {
-    if (actualWinner !== state.winner) {
-      return false;
-    }
-  } else if (state.winner === 'draw') {
-    if (filled !== 9 || actualWinner !== null) {
-      return false;
-    }
-  } else {
-    if (actualWinner !== null || filled === 9) {
-      return false;
-    }
-  }
-
-  if (state.isActive && state.winner !== null) {
+  if (!board.every((cell, index) => cell === replay[index])) {
     return false;
   }
 
-  if (!state.isActive && state.winner === null) {
-    return false;
-  }
+  const expectedWinner: Winner =
+    replayWinner ?? (replayDraw ? 'draw' : null);
 
-  return true;
+  return (
+    value.currentPlayer === playerToMove &&
+    value.winner === expectedWinner &&
+    value.isActive === (expectedWinner === null)
+  );
 }
+
 
 export function createGame() {
   let state = createInitialState();
