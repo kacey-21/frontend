@@ -1,5 +1,6 @@
 import type {
   Board,
+  Cell,
   GameState,
   Move,
   Player,
@@ -50,6 +51,46 @@ export function createInitialState(): GameState {
     history: [],
   };
 }
+export function makeMove(
+  state: GameState,
+  index: number
+): GameState | null {
+  if (
+    !Number.isInteger(index) ||
+    index < 0 ||
+    index > 8 ||
+    !state.isActive ||
+    state.board[index] !== ''
+  ) {
+    return null;
+  }
+
+  const player = state.currentPlayer;
+  const board = copyBoard(state.board);
+
+  board[index] = player;
+
+  const winner = findWinner(board);
+  const movesCount = state.movesCount + 1;
+  const isDraw = winner === null && movesCount === 9;
+
+  return {
+    board,
+    currentPlayer:
+      winner || isDraw
+        ? player
+        : player === 'X'
+          ? 'O'
+          : 'X',
+    isActive: winner === null && !isDraw,
+    winner: winner ?? (isDraw ? 'draw' : null),
+    movesCount,
+    history: [
+      ...state.history,
+      { player, index },
+    ],
+  };
+}
 
 export function findWinner(board: Board): Winner {
   for (const [a, b, c] of WIN_LINES) {
@@ -66,7 +107,9 @@ export function findWinner(board: Board): Winner {
 
   return null;
 }
-
+function getWinner(board: Board): Player | null {
+  return findWinner(board) as Player | null;
+}
 
 export function isValidState(value: unknown): value is GameState {
   if (!isRecord(value) || !isBoard(value.board)) {
