@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import confetti from 'canvas-confetti';
-
 import {
   createInitialState,
+  isValidState,
   makeMove,
 } from './game/game';
 import { GameBoard } from './components/GameBoard';
@@ -49,15 +48,13 @@ function loadSavedData(): SavedData | null {
       throw new Error('Неверная версия сохранения');
     }
 
-    const game = createGame();
-
-    if (!game.loadState(data.gameState)) {
+    if (!isValidState(data.gameState)) {
       throw new Error('Некорректное состояние игры');
     }
 
     return {
       version: SAVE_VERSION,
-      gameState: game.getState(),
+      gameState: data.gameState,
       roomInput: data.roomInput,
     };
   } catch (error) {
@@ -98,13 +95,11 @@ export default function App() {
     }
   }, [gameState, roomName]);
 
- function handleMove(index: number): void {
-  setGameState((previousState) => {
-    const newState = makeMove(previousState, index);
-
-    return newState ?? previousState;
-  });
-}
+  function handleMove(index: number): void {
+    setGameState((previousState) => {
+      return makeMove(previousState, index) ?? previousState;
+    });
+  }
   function handleReset(): void {
     setGameState(createInitialState());
   }
