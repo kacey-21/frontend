@@ -118,3 +118,61 @@ test('Загрузка корректного состояния', () => {
   assert.equal(game.getState().movesCount, 3);
   assert.equal(game.getState().currentPlayer, 'O');
 });
+
+test('Отклонение истории X0, O3, X1, O4, X2, O8', () => {
+  const state = {
+    board: ['X', 'X', 'X', 'O', 'O', '', '', '', 'O'],
+    currentPlayer: 'X',
+    isActive: false,
+    winner: 'X',
+    movesCount: 6,
+    history: [
+      { player: 'X', index: 0 },
+      { player: 'O', index: 3 },
+      { player: 'X', index: 1 },
+      { player: 'O', index: 4 },
+      { player: 'X', index: 2 },
+      { player: 'O', index: 8 },
+    ],
+  };
+
+  assert.equal(isValidState(state), false);
+});
+
+test('Отклонение неправильного currentPlayer после победы', () => {
+  const state = {
+    board: ['X', 'O', '', '', 'X', 'O', '', '', 'X'],
+    currentPlayer: 'O',
+    isActive: false,
+    winner: 'X',
+    movesCount: 5,
+    history: [
+      { player: 'X', index: 0 },
+      { player: 'O', index: 1 },
+      { player: 'X', index: 4 },
+      { player: 'O', index: 5 },
+      { player: 'X', index: 8 },
+    ],
+  };
+
+  assert.equal(isValidState(state), false);
+});
+
+test('Корректная завершённая партия проходит проверку', () => {
+  const state = {
+    board: ['X', 'O', '', '', 'X', 'O', '', '', 'X'],
+    currentPlayer: 'X',
+    isActive: false,
+    winner: 'X',
+    movesCount: 5,
+    history: [
+      { player: 'X', index: 0 },
+      { player: 'O', index: 1 },
+      { player: 'X', index: 4 },
+      { player: 'O', index: 5 },
+      { player: 'X', index: 8 },
+    ],
+  };
+
+  assert.equal(isValidState(state), true);
+});
