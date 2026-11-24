@@ -16,6 +16,21 @@ const WIN_LINES: number[][] = [
   [0, 4, 8],
   [2, 4, 6],
 ];
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isPlayer(value: unknown): value is Player {
+  return value === 'X' || value === 'O';
+}
+
+function isCell(value: unknown): value is Cell {
+  return value === '' || isPlayer(value);
+}
+
+function isBoard(value: unknown): value is Board {
+  return Array.isArray(value) && value.length === 9 && value.every(isCell);
+}
 
 export function createInitialState(): GameState {
   return {
